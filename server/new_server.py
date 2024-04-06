@@ -28,7 +28,7 @@ class ClientProtocol(basic.LineReceiver):
         output = ''
         for chunk in self.factory.chain.stream(phrase):
             output += chunk
-            data = {"type": "phrase", "message": chunk}
+            data = {"type": "phrase", "message": output}
             data_string = json.dumps(data)
             # client_socket.sendall(data_string.encode())
             self.factory.tasker.thing.transport.write(data_string.encode())

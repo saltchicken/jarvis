@@ -21,9 +21,14 @@ class ClientThread(threading.Thread):
         while not self.quit_event.is_set():
             try:
                 data = self.client_socket.recv(4096).decode()
-                print(data)
+                # print(data)
                 # self.label.setText(data)
-                packet = json.loads(data)
+                try:
+                    packet = json.loads(data)
+                except:
+                    logger.error('Something wrong with data')
+                    logger.error(data)
+                    continue
                 if packet['type'] == 'phrase':
                     self.label.setText(packet['message'])
             except socket.timeout:
