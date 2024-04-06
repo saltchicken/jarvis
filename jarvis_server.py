@@ -1,4 +1,4 @@
-from server import server
+from server import new_server as server
 
 if __name__ == "__main__":
     server.main()
