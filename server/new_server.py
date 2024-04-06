@@ -45,7 +45,7 @@ class ClientProtocol(basic.LineReceiver):
         # self.factory.tasker.thing.transport.write(output.encode())
         
     def send_data(self, _, data):
-        logger.debug(f"{Sending}: data")
+        logger.debug(f"Sending: {data}")
         self.factory.tasker.thing.transport.write(data.encode())
             
 
