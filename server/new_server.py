@@ -3,8 +3,6 @@ import json
 from twisted.internet import protocol, reactor, threads
 from twisted.protocols import basic
 
-# from twisted.internet.defer import Deferred
-
 from server.llm.llm import setup_llm
 
 from loguru import logger
@@ -20,62 +18,23 @@ class ClientProtocol(basic.LineReceiver):
 
     def connectionLost(self, reason):
         print(f"{self.factory.name} disconnected")
-
-    # def lineReceived(self, line):
-    #     print("Received:", line)
-    #     # for client in self.factory.clients:
-    #     #     if client != self:
-    #     #         client.sendLine(line.encode())
-
-    # def runLLM(self, phrase):
-    #     print(f"Running LLM: on {phrase}")
-        
-    #     output = ''
-    #     for chunk in self.factory.chain.stream(phrase):
-    #         # d = Deferred()
-    #         output += chunk
-            # d.addCallback(self.send_data, chunk)
-            # d.callback(None)
-            # data = {"type": "phrase", "message": output}
-            # data_string = json.dumps(data)
-            # client_socket.sendall(data_string.encode())
-            # self.factory.tasker.thing.transport.write(data_string.encode())
-            # logger.debug(output)
-            # self.factory.tasker.thing.sendLine(output.encode())
-        # self.factory.tasker.thing.transport.write(output.encode())
-        
-    # def send_data(self, _, data):
-    #     logger.debug(f"Sending: {data}")
-    #     self.factory.tasker.thing.transport.write(data.encode())
             
     def runLLM(self, data):
         output = ''
         for chunk in self.factory.chain.stream(data):
-            # d = Deferred()
             output += chunk
-            logger.debug(output)
+            # logger.debug(output)
             data_object = {"type": "phrase", "message": output}
             data_string = json.dumps(data_object)
-            # client_socket.sendall(data_string.encode())
             self.factory.tasker.thing.sendLine(data_string.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
-        # message = 'testing ' * 100
-        # sender = self.send_data_in_chunks(message)
         if self.factory.name == "Talon":
-            print('Take action')
             packet = json.loads(data)
             if packet['type'] == 'phrase':
-                # reactor.callLater(0, self.runLLM, packet['message'])
-                logger.debug('Running thread for LLM')
                 d = threads.deferToThread(self.runLLM, packet['message'])
                 
-                # self.runLLM(packet['message'])
-            # self.factory.tasker.thing.transport.write(data.encode())
-            # self.factory.tasker.thing.transport.write(data)
-
-
 
 class TalonFactory(protocol.Factory):
     def __init__(self):
@@ -97,22 +56,15 @@ class TaskerFactory(protocol.Factory):
         return ClientProtocol(self)
 
 def main():
-    # Port for client 1
     talon_port = 8000
-    # Port for client 2
     tasker_port = 8001
 
-    # Create factory instances
     talon_factory = TalonFactory()
-
-    # clients.append(talon_factory)
-    # clients.append(tasker_factory)
-
-    # Start listening for client connections on respective ports
+    
     reactor.listenTCP(talon_port, talon_factory)
     reactor.listenTCP(tasker_port, talon_factory.tasker)
 
-    print("Server started")
+    logger.debug("Server started")
     reactor.run()
 
 if __name__ == "__main__":
