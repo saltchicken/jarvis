@@ -29,9 +29,10 @@ class ClientProtocol(basic.LineReceiver):
 
     def runLLM(self, phrase):
         print(f"Running LLM: on {phrase}")
-        d = Deferred()
+        
         output = ''
         for chunk in self.factory.chain.stream(phrase):
+            d = Deferred()
             output += chunk
             d.addCallback(self.send_data, chunk)
             d.callback(None)
