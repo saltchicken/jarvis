@@ -36,7 +36,8 @@ class ClientProtocol(basic.LineReceiver):
             # self.factory.tasker.thing.transport.write(data_string.encode())
             logger.debug(output)
             # self.factory.tasker.thing.sendLine(output.encode())
-            self.factory.tasker.thing.transport.write(output.encode())
+            # self.factory.tasker.thing.transport.write(output.encode())
+            reactor.callLater(0, self.transport.write, output.encode())
 
 
     def dataReceived(self, data):
