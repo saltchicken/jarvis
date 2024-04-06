@@ -3,6 +3,8 @@ import json
 from twisted.internet import protocol, reactor
 from twisted.protocols import basic
 
+from twisted.internet.defer import Deferred
+
 from server.llm.llm import setup_llm
 
 from loguru import logger
@@ -27,44 +29,40 @@ class ClientProtocol(basic.LineReceiver):
 
     def runLLM(self, phrase):
         print(f"Running LLM: on {phrase}")
+        d = Deferred()
         output = ''
         for chunk in self.factory.chain.stream(phrase):
             output += chunk
-            data = {"type": "phrase", "message": output}
-            data_string = json.dumps(data)
+            d.addCallback(self.send_data, chunk)
+            d.callback(None)
+            # data = {"type": "phrase", "message": output}
+            # data_string = json.dumps(data)
             # client_socket.sendall(data_string.encode())
             # self.factory.tasker.thing.transport.write(data_string.encode())
             # logger.debug(output)
             # self.factory.tasker.thing.sendLine(output.encode())
-        self.factory.tasker.thing.transport.write(output.encode())
+        # self.factory.tasker.thing.transport.write(output.encode())
+        
+    def send_data(self, _, data):
+        logger.debug(f"{Sending}: data")
+        self.factory.tasker.thing.transport.write(data.encode())
             
 
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
-        message = 'testing ' * 100
-        sender = self.send_data_in_chunks(message)
-        next(sender)
+        # message = 'testing ' * 100
+        # sender = self.send_data_in_chunks(message)
         if self.factory.name == "Talon":
             print('Take action')
             packet = json.loads(data)
-            # if packet['type'] == 'phrase':
+            if packet['type'] == 'phrase':
                 # reactor.callLater(0, self.runLLM, packet['message'])
                 
-                # self.runLLM(packet['message'])
+                self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
-    
-    def send_data_in_chunks(self, data, chunk_size=64):
-        """
-        Sends data in chunks to the client
-        """
-        for i in range(0, len(data), chunk_size):
-            chunk = data[i:i+chunk_size]
-            print('hello')
-            self.factory.tasker.thing.transport.write(chunk.encode())
-            # Let other events be processed
-            yield
+
 
 
 class TalonFactory(protocol.Factory):
