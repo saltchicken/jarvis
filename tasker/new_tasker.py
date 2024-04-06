@@ -24,11 +24,18 @@ class EchoClient(basic.LineReceiver):
     #     print("Server said:", data.decode())
     #     self.transport.loseConnection()
     
-    def lineReceived(self, line):
-        print("Received:", line)
+    # def lineReceived(self, line):
+    #     logger.debug("Received:", line.decode())
         # for client in self.factory.clients:
         #     if client != self:
         #         client.sendLine(line.encode())
+        
+    def dataReceived(self, data):
+        logger.debug(f"Received data: {data}")
+        # if self.factory.name == "Talon":
+        #     packet = json.loads(data)
+        #     if packet['type'] == 'phrase':
+        #         self.runLLM(packet['message'])
 
 class EchoClientFactory(protocol.ClientFactory):
     # def __init__(self):
@@ -123,9 +130,14 @@ class OverlayWindow(QWidget):
         self.move(int((self.screen.width()-self.width)/2), int((self.screen.height()-self.height)/2))
         
     def start_server(self):
-        self.quit_event = threading.Event()
-        self.server_thread = ClientThread(self.label, self.quit_event)
-        self.server_thread.start()
+        # self.quit_event = threading.Event()
+        # self.server_thread = ClientThread(self.label, self.quit_event)
+        # self.server_thread.start()
+        server_address = '192.168.1.11'
+        server_port = 8001
+        
+        reactor.connectTCP(server_address, server_port, EchoClientFactory())
+        reactor.run()
                 
     def quit_action(self):
         checked = self.quit_action_checkbox.isChecked()
