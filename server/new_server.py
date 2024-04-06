@@ -42,12 +42,13 @@ class ClientProtocol(basic.LineReceiver):
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
+        message = 'testing ' * 100
+        self.send_data_in_chunks(message)
         if self.factory.name == "Talon":
             packet = json.loads(data)
             if packet['type'] == 'phrase':
                 # reactor.callLater(0, self.runLLM, packet['message'])
-                message = 'testing ' * 100
-                self.send_data_in_chunks(message)
+                
                 # self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
