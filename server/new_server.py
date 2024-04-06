@@ -58,6 +58,7 @@ class ClientProtocol(basic.LineReceiver):
         """
         for i in range(0, len(data), chunk_size):
             chunk = data[i:i+chunk_size]
+            print('hello')
             self.factory.tasker.thing.transport.write(chunk)
             # Let other events be processed
             yield
