@@ -6,6 +6,45 @@ from PyQt5.QtCore import Qt, QTimerEvent
 import socket, threading
 from loguru import logger
 
+from twisted.internet import reactor, protocol
+from twisted.protocols import basic
+
+class EchoClient(basic.LineReceiver):
+    def __init__(self, factory):
+        self.factory = factory
+        
+    def connectionMade(self):
+        print(f"Connected")
+        # self.transport.write(b"Hello, twisted server!")
+        
+    def connectionLost(self, reason):
+        print(f"Disconnected")
+
+    # def dataReceived(self, data):
+    #     print("Server said:", data.decode())
+    #     self.transport.loseConnection()
+    
+    def lineReceived(self, line):
+        print("Received:", line)
+        # for client in self.factory.clients:
+        #     if client != self:
+        #         client.sendLine(line.encode())
+
+class EchoClientFactory(protocol.ClientFactory):
+    # def __init__(self):
+    #     self.name = "Remove this"
+        
+    def buildProtocol(self, addr):
+        return EchoClient(self)
+
+    def clientConnectionFailed(self, connector, reason):
+        print("Connection failed.")
+        reactor.stop()
+
+    def clientConnectionLost(self, connector, reason):
+        print("Connection lost.")
+        reactor.stop()
+
 class ClientThread(threading.Thread):
     def __init__(self, label, quit_event):
         super().__init__()
@@ -17,12 +56,15 @@ class ClientThread(threading.Thread):
     def run(self):
         server_address = '192.168.1.11'
         server_port = 8001
-        self.client_socket.connect((server_address, server_port))
-        while not self.quit_event.is_set():
-            try:
-                data = self.client_socket.recv(16).decode()
-                logger.debug(data)
-                self.label.setText(data)
+        
+        reactor.connectTCP(server_address, server_port, EchoClientFactory())
+        reactor.run()
+        # self.client_socket.connect((server_address, server_port))
+        # while not self.quit_event.is_set():
+        #     try:
+        #         data = self.client_socket.recv(1024).decode()
+        #         logger.debug(data)
+        #         self.label.setText(data)
                 # try:
                 #     packet = json.loads(data)
                 # except:
@@ -33,10 +75,10 @@ class ClientThread(threading.Thread):
                 # if packet['type'] == 'phrase':
                 #     print('set text')
                     # self.label.setText(packet['message'])
-            except socket.timeout:
-                logger.debug('Socket timeout')
-                pass
-        self.client_socket.close()
+            # except socket.timeout:
+            #     logger.debug('Socket timeout')
+            #     pass
+        # self.client_socket.close()
 
 class OverlayWindow(QWidget):
     def __init__(self, args):
