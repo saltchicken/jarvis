@@ -45,8 +45,9 @@ class ClientProtocol(basic.LineReceiver):
         message = 'testing ' * 100
         self.send_data_in_chunks(message)
         if self.factory.name == "Talon":
+            print('Take action')
             packet = json.loads(data)
-            if packet['type'] == 'phrase':
+            # if packet['type'] == 'phrase':
                 # reactor.callLater(0, self.runLLM, packet['message'])
                 
                 # self.runLLM(packet['message'])
