@@ -55,7 +55,7 @@ class ClientProtocol(basic.LineReceiver):
             output += chunk
             logger.debug(output)
             data_object = {"type": "phrase", "message": output}
-            data_string = json.dumps(data)
+            data_string = json.dumps(data_object)
             # client_socket.sendall(data_string.encode())
             self.factory.tasker.thing.sendLine(data_string.encode())
 
