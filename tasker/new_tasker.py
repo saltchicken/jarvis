@@ -20,7 +20,7 @@ class ClientThread(threading.Thread):
         self.client_socket.connect((server_address, server_port))
         while not self.quit_event.is_set():
             try:
-                data = self.client_socket.recv(1024 * 20).decode()
+                data = self.client_socket.recv(128).decode()
                 logger.debug(data)
                 self.label.setText(data)
                 # try:
