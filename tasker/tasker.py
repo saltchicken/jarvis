@@ -89,10 +89,9 @@ class OverlayWindow(QWidget):
         if checked:
             self.label.setText('')
           
-        
-
-if __name__ == '__main__':
-    parser = configargparse.ArgParser(default_config_files=['conf/server/default.ini'])
+          
+def main():
+    parser = configargparse.ArgParser(default_config_files=['tasker/conf/default.ini'])
     parser.add('--width', type=int, required=True, help="Width of overlay")
     parser.add('--height', type=int, required=True, help="Height of overlay")
     args = parser.parse_args()
@@ -101,4 +100,7 @@ if __name__ == '__main__':
     window = OverlayWindow(args)
     # window.label.setText('Test')
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec_())   
+
+if __name__ == '__main__':
+    main()
