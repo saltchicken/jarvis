@@ -32,14 +32,16 @@ class EchoClient(basic.LineReceiver):
         
     def dataReceived(self, data):
         logger.debug(f"Received data: {data}")
+        label_text = data.decode()
+        self.factory.label.setText(label_text)
         # if self.factory.name == "Talon":
         #     packet = json.loads(data)
         #     if packet['type'] == 'phrase':
         #         self.runLLM(packet['message'])
 
 class EchoClientFactory(protocol.ClientFactory):
-    # def __init__(self):
-    #     self.name = "Remove this"
+    def __init__(self, label):
+        self.label = label
         
     def buildProtocol(self, addr):
         return EchoClient(self)
@@ -64,28 +66,28 @@ class ClientThread(threading.Thread):
         server_address = '192.168.1.11'
         server_port = 8001
         
-        reactor.connectTCP(server_address, server_port, EchoClientFactory())
-        reactor.run()
-        # self.client_socket.connect((server_address, server_port))
-        # while not self.quit_event.is_set():
-        #     try:
-        #         data = self.client_socket.recv(1024).decode()
-        #         logger.debug(data)
-        #         self.label.setText(data)
-                # try:
-                #     packet = json.loads(data)
-                # except:
-                #     logger.error('Something wrong with data')
-                #     logger.error(data)
-                #     continue
-                # print('it worked')
-                # if packet['type'] == 'phrase':
-                #     print('set text')
-                    # self.label.setText(packet['message'])
-            # except socket.timeout:
-            #     logger.debug('Socket timeout')
-            #     pass
-        # self.client_socket.close()
+        # reactor.connectTCP(server_address, server_port, EchoClientFactory(self.label))
+        # reactor.run()
+        self.client_socket.connect((server_address, server_port))
+        while not self.quit_event.is_set():
+            try:
+                data = self.client_socket.recv(1024 * 4).decode()
+                # logger.debug(data)
+                # self.label.setText(data)
+                try:
+                    packet = json.loads(data)
+                except:
+                    logger.error('Something wrong with data')
+                    logger.error(data)
+                    continue
+                print('it worked')
+                if packet['type'] == 'phrase':
+                    print('set text')
+                    self.label.setText(packet['message'])
+            except socket.timeout:
+                logger.debug('Socket timeout')
+                pass
+        self.client_socket.close()
 
 class OverlayWindow(QWidget):
     def __init__(self, args):
@@ -130,14 +132,14 @@ class OverlayWindow(QWidget):
         self.move(int((self.screen.width()-self.width)/2), int((self.screen.height()-self.height)/2))
         
     def start_server(self):
-        # self.quit_event = threading.Event()
-        # self.server_thread = ClientThread(self.label, self.quit_event)
-        # self.server_thread.start()
-        server_address = '192.168.1.11'
-        server_port = 8001
+        self.quit_event = threading.Event()
+        self.server_thread = ClientThread(self.label, self.quit_event)
+        self.server_thread.start()
+        # server_address = '192.168.1.11'
+        # server_port = 8001
         
-        reactor.connectTCP(server_address, server_port, EchoClientFactory())
-        reactor.run()
+        # reactor.connectTCP(server_address, server_port, EchoClientFactory(self.label))
+        # reactor.run()
                 
     def quit_action(self):
         checked = self.quit_action_checkbox.isChecked()

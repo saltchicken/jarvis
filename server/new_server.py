@@ -27,13 +27,13 @@ class ClientProtocol(basic.LineReceiver):
     #     #     if client != self:
     #     #         client.sendLine(line.encode())
 
-    def runLLM(self, phrase):
-        print(f"Running LLM: on {phrase}")
+    # def runLLM(self, phrase):
+    #     print(f"Running LLM: on {phrase}")
         
-        output = ''
-        for chunk in self.factory.chain.stream(phrase):
-            # d = Deferred()
-            output += chunk
+    #     output = ''
+    #     for chunk in self.factory.chain.stream(phrase):
+    #         # d = Deferred()
+    #         output += chunk
             # d.addCallback(self.send_data, chunk)
             # d.callback(None)
             # data = {"type": "phrase", "message": output}
@@ -48,13 +48,16 @@ class ClientProtocol(basic.LineReceiver):
     #     logger.debug(f"Sending: {data}")
     #     self.factory.tasker.thing.transport.write(data.encode())
             
-    def process_data(self, data):
+    def runLLM(self, data):
         output = ''
         for chunk in self.factory.chain.stream(data):
             # d = Deferred()
             output += chunk
             logger.debug(output)
-            self.factory.tasker.thing.sendLine(output.encode())
+            data_object = {"type": "phrase", "message": output}
+            data_string = json.dumps(data)
+            # client_socket.sendall(data_string.encode())
+            self.factory.tasker.thing.sendLine(data_string.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
@@ -66,7 +69,7 @@ class ClientProtocol(basic.LineReceiver):
             if packet['type'] == 'phrase':
                 # reactor.callLater(0, self.runLLM, packet['message'])
                 logger.debug('Running thread for LLM')
-                d = threads.deferToThread(self.process_data, packet['message'])
+                d = threads.deferToThread(self.runLLM, packet['message'])
                 
                 # self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
