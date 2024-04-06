@@ -43,7 +43,8 @@ class ClientProtocol(basic.LineReceiver):
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
         message = 'testing ' * 100
-        self.send_data_in_chunks(message)
+        sender = self.send_data_in_chunks(message)
+        next(sender)
         if self.factory.name == "Talon":
             print('Take action')
             packet = json.loads(data)
@@ -54,7 +55,7 @@ class ClientProtocol(basic.LineReceiver):
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
     
-    def send_data_in_chunks(self, data, chunk_size=4):
+    def send_data_in_chunks(self, data, chunk_size=64):
         """
         Sends data in chunks to the client
         """
