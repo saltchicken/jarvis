@@ -1,9 +1,9 @@
 import json
 
-from twisted.internet import protocol, reactor
+from twisted.internet import protocol, reactor, threads
 from twisted.protocols import basic
 
-from twisted.internet.defer import Deferred
+# from twisted.internet.defer import Deferred
 
 from server.llm.llm import setup_llm
 
@@ -32,10 +32,10 @@ class ClientProtocol(basic.LineReceiver):
         
         output = ''
         for chunk in self.factory.chain.stream(phrase):
-            d = Deferred()
+            # d = Deferred()
             output += chunk
-            d.addCallback(self.send_data, chunk)
-            d.callback(None)
+            # d.addCallback(self.send_data, chunk)
+            # d.callback(None)
             # data = {"type": "phrase", "message": output}
             # data_string = json.dumps(data)
             # client_socket.sendall(data_string.encode())
@@ -44,11 +44,17 @@ class ClientProtocol(basic.LineReceiver):
             # self.factory.tasker.thing.sendLine(output.encode())
         # self.factory.tasker.thing.transport.write(output.encode())
         
-    def send_data(self, _, data):
-        logger.debug(f"Sending: {data}")
-        self.factory.tasker.thing.transport.write(data.encode())
+    # def send_data(self, _, data):
+    #     logger.debug(f"Sending: {data}")
+    #     self.factory.tasker.thing.transport.write(data.encode())
             
-
+    def process_data(self, data):
+        output = ''
+        for chunk in self.factory.chain.stream(data):
+            # d = Deferred()
+            output += chunk
+            logger.debug(output)
+            self.factory.tasker.thing.sendLine(output.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
@@ -59,8 +65,10 @@ class ClientProtocol(basic.LineReceiver):
             packet = json.loads(data)
             if packet['type'] == 'phrase':
                 # reactor.callLater(0, self.runLLM, packet['message'])
+                logger.debug('Running thread for LLM')
+                d = threads.deferToThread(self.process_data, packet['message'])
                 
-                self.runLLM(packet['message'])
+                # self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
 
