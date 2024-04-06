@@ -21,6 +21,8 @@ class ClientThread(threading.Thread):
         while not self.quit_event.is_set():
             try:
                 data = self.client_socket.recv(4096).decode()
+                print(data)
+                # self.label.setText(data)
                 packet = json.loads(data)
                 if packet['type'] == 'phrase':
                     self.label.setText(packet['message'])

@@ -1,9 +1,11 @@
+import json
+
 from twisted.internet import protocol, reactor
 from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
-# global clients
-# clients = []
+
+
 class ClientProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
@@ -23,18 +25,27 @@ class ClientProtocol(basic.LineReceiver):
 
     def runLLM(self, phrase):
         print(f"Running LLM: on {phrase}")
+        output = ''
+        for chunk in self.chain.stream(phrase):
+            output += chunk
+            self.factory.tasker.thing.transport.write(output.encode())
+
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
+            packet = json.loads(data)
+            if packet['type'] == 'phrase':
+                self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
-            self.factory.tasker.thing.transport.write(data)
+            # self.factory.tasker.thing.transport.write(data)
 
 
 class TalonFactory(protocol.Factory):
     def __init__(self):
         self.name = "Talon"
         self.tasker = TaskerFactory()
+        self.chain = setup_llm()
 
     def buildProtocol(self, addr):
         return ClientProtocol(self)
