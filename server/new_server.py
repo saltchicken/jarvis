@@ -54,7 +54,7 @@ class ClientProtocol(basic.LineReceiver):
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
     
-    def send_data_in_chunks(self, data, chunk_size=64):
+    def send_data_in_chunks(self, data, chunk_size=4):
         """
         Sends data in chunks to the client
         """
