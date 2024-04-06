@@ -45,10 +45,22 @@ class ClientProtocol(basic.LineReceiver):
         if self.factory.name == "Talon":
             packet = json.loads(data)
             if packet['type'] == 'phrase':
-                reactor.callLater(0, self.runLLM, packet['message'])
+                # reactor.callLater(0, self.runLLM, packet['message'])
+                message = 'testing ' * 100
+                self.send_data_in_chunks(message)
                 # self.runLLM(packet['message'])
             # self.factory.tasker.thing.transport.write(data.encode())
             # self.factory.tasker.thing.transport.write(data)
+    
+    def send_data_in_chunks(self, data, chunk_size=64):
+        """
+        Sends data in chunks to the client
+        """
+        for i in range(0, len(data), chunk_size):
+            chunk = data[i:i+chunk_size]
+            self.transport.write(chunk)
+            # Let other events be processed
+            yield
 
 
 class TalonFactory(protocol.Factory):
