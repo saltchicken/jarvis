@@ -5,6 +5,8 @@ from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
 
+from loguru import logger
+
 
 class ClientProtocol(basic.LineReceiver):
     def __init__(self, factory):
@@ -32,7 +34,7 @@ class ClientProtocol(basic.LineReceiver):
             data_string = json.dumps(data)
             # client_socket.sendall(data_string.encode())
             # self.factory.tasker.thing.transport.write(data_string.encode())
-            print(output)
+            logger.debug(output)
             # self.factory.tasker.thing.sendLine(output.encode())
             self.factory.tasker.thing.transport.write(output.encode())
 
