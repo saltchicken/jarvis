@@ -1,7 +1,7 @@
 from twisted.internet import protocol, reactor
 from twisted.protocols import basic
 
-from llm import setup_llm
+from server.llm.llm import setup_llm
 # global clients
 # clients = []
 class ClientProtocol(basic.LineReceiver):
