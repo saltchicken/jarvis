@@ -26,7 +26,7 @@ class ClientProtocol(basic.LineReceiver):
     def runLLM(self, phrase):
         print(f"Running LLM: on {phrase}")
         output = ''
-        for chunk in self.chain.stream(phrase):
+        for chunk in self.factory.chain.stream(phrase):
             output += chunk
             self.factory.tasker.thing.transport.write(output.encode())
 
