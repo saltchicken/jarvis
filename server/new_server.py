@@ -32,7 +32,7 @@ class ClientProtocol(basic.LineReceiver):
             data_string = json.dumps(data)
             # client_socket.sendall(data_string.encode())
             # self.factory.tasker.thing.transport.write(data_string.encode())
-            self.factory.tasker.thing.transport.write(output.encode())
+            self.factory.tasker.thing.transport.sendLine(output.encode())
 
 
     def dataReceived(self, data):
