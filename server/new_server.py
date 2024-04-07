@@ -34,6 +34,7 @@ class ClientProtocol(basic.LineReceiver):
         if self.factory.name == "Talon":
             # packet = json.loads(data)
             message = PhraseMessage(dump=data)
+            print(message)
             # if packet['type'] == 'phrase':
             if message.type == 'phrase':
                 d = threads.deferToThread(self.runLLM, message.message)
