@@ -47,7 +47,7 @@ class TalonProtocol(basic.LineReceiver):
         
 
     def dataReceived(self, data):
-        logger.debug(f"{self.factory.name} received data: {data}")
+        logger.debug(f"Talon received data: {data}")
         message = JSONMessage(dump=data)
         if message.type == 'phrase':
             self.factory.d = defer.Deferred()
