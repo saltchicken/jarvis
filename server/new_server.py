@@ -4,6 +4,7 @@ from twisted.internet import protocol, reactor, threads
 from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
+from server.classes import PhraseMessage
 
 from loguru import logger
 
