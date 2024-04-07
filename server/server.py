@@ -1,6 +1,6 @@
 import json
 
-from twisted.internet import protocol, reactor, threads
+from twisted.internet import protocol, reactor, threads, defer
 from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
@@ -12,6 +12,7 @@ from loguru import logger
 class ClientProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
+        self.d = None
 
     def connectionMade(self):
         logger.debug(f"{self.factory.name} connected")
@@ -20,13 +21,22 @@ class ClientProtocol(basic.LineReceiver):
     def connectionLost(self, reason):
         logger.debug(f"{self.factory.name} disconnected")
             
-    def runLLM(self, data):
+    def runLLM(self, data, deferred):
         output = ''
         for chunk in self.factory.chain.stream(data):
-            output += chunk
-            message = PhraseMessage(message=output)
-            self.send(message)
-        reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
+            try:
+                output += chunk
+                message = PhraseMessage(message=output)
+                self.send(message)
+                # logger.debug(deferred.called)
+                if deferred.called:
+                    deferred.callback(output)
+                    break
+            except Exception as e:
+                logger.error(e)
+        # TODO: Make a function explicitly for calling after LLM stream is done
+        logger.debug('LLM thread complete')
+        # reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
     
     def send(self, message):
         self.factory.tasker.client.sendLine(message.dump.encode())
@@ -41,7 +51,20 @@ class ClientProtocol(basic.LineReceiver):
         if self.factory.name == "Talon":
             message = JSONMessage(dump=data)
             if message.type == 'phrase':
-                d = threads.deferToThread(self.runLLM, message.message)
+                self.factory.d = defer.Deferred()
+                logger.debug('Created deferred')
+                t = threads.deferToThread(self.runLLM, message.message, self.factory.d)
+                self.factory.d.associatedThread = t
+                self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
+                self.factory.d.addErrback(lambda result: print(f"Cancellation Received"))
+            elif message.type == 'command':
+                if message.message == "stop":
+                    if self.factory.d == None:
+                        logger.warning('self.d is None')
+                    else:
+                        self.factory.d.cancel()
+                elif message.message == 'clear':
+                    reactor.callLater(0, threads.deferToThread, self.sendSystemMessage, 'clear')
                 
 
 class TalonFactory(protocol.Factory):
@@ -49,6 +72,7 @@ class TalonFactory(protocol.Factory):
         self.name = "Talon"
         self.tasker = TaskerFactory()
         self.chain = setup_llm()
+        self.d = None
 
     def buildProtocol(self, addr):
         return ClientProtocol(self)
