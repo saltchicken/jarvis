@@ -57,7 +57,10 @@ class ClientProtocol(basic.LineReceiver):
                 self.d.associatedThread = t
                 self.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
                 self.d.addErrback(handle_cancellation)
-                reactor.callLater(2, cancel_computation, self.d)
+                # reactor.callLater(2, cancel_computation, self.d)
+            elif message.type == 'command':
+                if message.message == "interrupt":
+                    reactor.callLater(0, cancel_computation, self.d)
                 
 
 class TalonFactory(protocol.Factory):
