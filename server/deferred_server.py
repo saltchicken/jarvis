@@ -49,6 +49,7 @@ class ClientProtocol(basic.LineReceiver):
             message = JSONMessage(dump=data)
             if message.type == 'phrase':
                 self.d = defer.Deferred()
+                logger.debug('Created deferred')
                 t = threads.deferToThread(self.runLLM, message.message, self.d)
                 def handle_cancellation(failure):
                     print("Computation was cancelled")
