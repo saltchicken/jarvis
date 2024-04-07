@@ -34,7 +34,9 @@ class ClientProtocol(basic.LineReceiver):
                     break
             except Exception as e:
                 logger.error(e)
-        reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
+        # TODO: Make a function explicitly for calling after LLM stream is done
+        logger.debug('LLM thread complete')
+        # reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
     
     def send(self, message):
         self.factory.tasker.client.sendLine(message.dump.encode())
