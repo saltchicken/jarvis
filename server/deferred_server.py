@@ -12,6 +12,7 @@ from loguru import logger
 class ClientProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
+        self.d = None
 
     def connectionMade(self):
         logger.debug(f"{self.factory.name} connected")
@@ -61,6 +62,8 @@ class ClientProtocol(basic.LineReceiver):
                 if message.message == "interrupt":
                     def cancel_computation(d):
                         d.cancel()
+                    if self.d == None:
+                        logger.warning('self.d is None')
                     reactor.callLater(0, cancel_computation, self.d)
                 
 
