@@ -48,8 +48,6 @@ class TaskerFactory(protocol.Factory):
     def __init__(self):
         self.name = "Tasker"
         self.client = None
-        
-        self.chain = setup_llm()
 
     def buildProtocol(self, addr):
         return ClientProtocol(self)
