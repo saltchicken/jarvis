@@ -3,7 +3,7 @@ import json
 
 @dataclass
 class JSONMessage:
-    type: str
+    type: str = None
     message: str = None
     dump: str = None
 
