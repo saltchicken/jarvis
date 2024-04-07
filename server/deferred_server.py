@@ -50,8 +50,6 @@ class ClientProtocol(basic.LineReceiver):
             if message.type == 'phrase':
                 self.d = defer.Deferred()
                 t = threads.deferToThread(self.runLLM, message.message, self.d)
-                def cancel_computation(d):
-                    d.cancel()
                 def handle_cancellation(failure):
                     print("Computation was cancelled")
                 self.d.associatedThread = t
@@ -60,6 +58,8 @@ class ClientProtocol(basic.LineReceiver):
                 # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
+                    def cancel_computation(d):
+                        d.cancel()
                     reactor.callLater(0, cancel_computation, self.d)
                 
 
