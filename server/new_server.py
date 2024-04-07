@@ -15,7 +15,7 @@ class ClientProtocol(basic.LineReceiver):
 
     def connectionMade(self):
         print(f"{self.factory.name} connected")
-        self.factory.thing = self
+        self.factory.client = self
 
     def connectionLost(self, reason):
         print(f"{self.factory.name} disconnected")
@@ -25,7 +25,7 @@ class ClientProtocol(basic.LineReceiver):
         for chunk in self.factory.chain.stream(data):
             output += chunk
             message = PhraseMessage(message=output)
-            self.factory.tasker.thing.sendLine(message.dump.encode())
+            self.factory.tasker.client.sendLine(message.dump.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
@@ -47,7 +47,7 @@ class TalonFactory(protocol.Factory):
 class TaskerFactory(protocol.Factory):
     def __init__(self):
         self.name = "Tasker"
-        self.thing = None
+        self.client = None
         
         self.chain = setup_llm()
 
