@@ -32,9 +32,11 @@ class ClientProtocol(basic.LineReceiver):
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
-            packet = json.loads(data)
-            if packet['type'] == 'phrase':
-                d = threads.deferToThread(self.runLLM, packet['message'])
+            # packet = json.loads(data)
+            message = PhraseMessage(dump=data)
+            # if packet['type'] == 'phrase':
+            if message.type == 'phrase':
+                d = threads.deferToThread(self.runLLM, message.message)
                 
 
 class TalonFactory(protocol.Factory):
