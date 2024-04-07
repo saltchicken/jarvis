@@ -26,7 +26,7 @@ class ClientProtocol(basic.LineReceiver):
             output += chunk
             message = PhraseMessage(message=output)
             self.send(message)
-        d = threads.deferToThread(self.sendSystemMessage('clear'))
+        d = threads.deferToThread(self.sendSystemMessage,'clear')
     
     def send(self, message):
         self.factory.tasker.client.sendLine(message.dump.encode())
