@@ -23,12 +23,15 @@ class ClientProtocol(basic.LineReceiver):
     def runLLM(self, data, deferred):
         output = ''
         for chunk in self.factory.chain.stream(data):
-            output += chunk
-            message = PhraseMessage(message=output)
-            self.send(message)
-            self.debug(deferred.called)
-            # if not deferred.called:
-            #     deferred.callback(output)
+            try:
+                output += chunk
+                message = PhraseMessage(message=output)
+                self.send(message)
+                self.debug(deferred.called)
+                # if not deferred.called:
+                #     deferred.callback(output)
+            except Exception as e:
+                print(e)
         reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
     
     def send(self, message):
