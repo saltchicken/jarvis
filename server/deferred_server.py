@@ -52,11 +52,9 @@ class ClientProtocol(basic.LineReceiver):
                 self.factory.d = defer.Deferred()
                 logger.debug('Created deferred')
                 t = threads.deferToThread(self.runLLM, message.message, self.factory.d)
-                def handle_cancellation(failure):
-                    print("Computation was cancelled")
                 self.factory.d.associatedThread = t
                 self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
-                self.factory.d.addErrback(handle_cancellation)
+                self.factory.d.addErrback(lambda result: print(f"Cancellation Received: {result}"))
                 # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
