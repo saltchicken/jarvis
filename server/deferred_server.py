@@ -48,8 +48,12 @@ class ClientProtocol(basic.LineReceiver):
                 def cancel_computation(d):
                     # Cancel the Deferred object
                     d.cancel()
+                def handle_cancellation(failure):
+                    # Print a message indicating that the computation was cancelled
+                    print("Computation was cancelled")
                 self.m.associatedThread = d
                 self.m.addCallback(lambda result: print("Result obtained:", result))
+                self.m.addErrback(handle_cancellation)
                 reactor.callLater(2, cancel_computation, self.m)
                 
 
