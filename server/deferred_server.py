@@ -56,7 +56,7 @@ class ClientProtocol(basic.LineReceiver):
                 self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
                 self.factory.d.addErrback(lambda result: print(f"Cancellation Received"))
             elif message.type == 'command':
-                if message.message == "interrupt":
+                if message.message == "stop":
                     if self.factory.d == None:
                         logger.warning('self.d is None')
                     else:
