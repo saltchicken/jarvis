@@ -19,6 +19,14 @@ class JSONMessage:
 @dataclass
 class PhraseMessage(JSONMessage):
     type: str = 'phrase'
+    
+@dataclass
+class SystemMessage(JSONMessage):
+    type: str = 'system'
+    
+@dataclass
+class CommandMessage(JSONMessage):
+    type: str = 'command'
 
 
 if __name__ == "__main__":
