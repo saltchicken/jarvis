@@ -49,23 +49,23 @@ class ClientProtocol(basic.LineReceiver):
         if self.factory.name == "Talon":
             message = JSONMessage(dump=data)
             if message.type == 'phrase':
-                self.d = defer.Deferred()
+                self.factory.d = defer.Deferred()
                 logger.debug('Created deferred')
-                t = threads.deferToThread(self.runLLM, message.message, self.d)
+                t = threads.deferToThread(self.runLLM, message.message, self.factory.d)
                 def handle_cancellation(failure):
                     print("Computation was cancelled")
-                self.d.associatedThread = t
-                self.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
-                self.d.addErrback(handle_cancellation)
+                self.factory.d.associatedThread = t
+                self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
+                self.factory.d.addErrback(handle_cancellation)
                 # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
                     # def cancel_computation(d):
                     #     d.cancel()
-                    if self.d == None:
+                    if self.factory.d == None:
                         logger.warning('self.d is None')
                     else:
-                        self.d.cancel()
+                        self.factory.d.cancel()
                     # reactor.callLater(0, cancel_computation, self.d)
                 
 
@@ -74,6 +74,7 @@ class TalonFactory(protocol.Factory):
         self.name = "Talon"
         self.tasker = TaskerFactory()
         self.chain = setup_llm()
+        self.d = None
 
     def buildProtocol(self, addr):
         return ClientProtocol(self)
