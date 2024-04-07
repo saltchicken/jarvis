@@ -26,6 +26,7 @@ class ClientProtocol(basic.LineReceiver):
             output += chunk
             message = PhraseMessage(message=output)
             self.send(message)
+            self.debug(deferred.called)
             if not deferred.called:
                 deferred.callback(output)
         reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
@@ -54,7 +55,7 @@ class ClientProtocol(basic.LineReceiver):
                 self.m.associatedThread = d
                 self.m.addCallback(lambda result: print("Result obtained:", result))
                 self.m.addErrback(handle_cancellation)
-                reactor.callLater(5, cancel_computation, self.m)
+                reactor.callLater(1, cancel_computation, self.m)
                 
 
 class TalonFactory(protocol.Factory):
