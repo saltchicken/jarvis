@@ -11,7 +11,8 @@ class JSONMessage:
         if self.dump is not None:
             self.message = json.loads(self.dump)['message']
         else:
-            self.dump = {"type": self.type, "message": self.message}
+            dump = {"type": self.type, "message": self.message}
+            self.dump = json.dumps(dump)
     
 @dataclass
 class PhraseMessage(JSONMessage):
