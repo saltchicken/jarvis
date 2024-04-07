@@ -34,7 +34,7 @@ class ClientProtocol(basic.LineReceiver):
                     break
             except Exception as e:
                 logger.error(e)
-        reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
+        reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
     
     def send(self, message):
         self.factory.tasker.client.sendLine(message.dump.encode())
@@ -55,16 +55,14 @@ class ClientProtocol(basic.LineReceiver):
                 self.factory.d.associatedThread = t
                 self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
                 self.factory.d.addErrback(lambda result: print(f"Cancellation Received"))
-                # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
-                    # def cancel_computation(d):
-                    #     d.cancel()
                     if self.factory.d == None:
                         logger.warning('self.d is None')
                     else:
                         self.factory.d.cancel()
-                    # reactor.callLater(0, cancel_computation, self.d)
+                elif message.message == 'clear':
+                    reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
                 
 
 class TalonFactory(protocol.Factory):
