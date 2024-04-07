@@ -72,7 +72,7 @@ class TaskerProtocol(basic.LineReceiver):
 
     def connectionMade(self):
         logger.debug(f"Tasker connected")
-        self.factory.client = self
+        self.factory.parent.tasker.client = self
 
     def connectionLost(self, reason):
         logger.debug(f"Tasker disconnected")
@@ -124,7 +124,7 @@ class TaskerProtocol(basic.LineReceiver):
 
 class TalonFactory(protocol.Factory):
     def __init__(self):
-        self.tasker = TaskerFactory()
+        self.tasker = TaskerFactory(self)
         self.chain = setup_llm()
         self.d = None
 
@@ -132,7 +132,8 @@ class TalonFactory(protocol.Factory):
         return TalonProtocol(self)
     
 class TaskerFactory(protocol.Factory):
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.client = None
 
     def buildProtocol(self, addr):
