@@ -62,7 +62,7 @@ class ClientProtocol(basic.LineReceiver):
                     else:
                         self.factory.d.cancel()
                 elif message.message == 'clear':
-                    reactor.callLater(6, threads.deferToThread, self.sendSystemMessage, 'clear')
+                    reactor.callLater(0, threads.deferToThread, self.sendSystemMessage, 'clear')
                 
 
 class TalonFactory(protocol.Factory):
