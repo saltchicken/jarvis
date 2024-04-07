@@ -9,7 +9,9 @@ class JSONMessage:
 
     def __post_init__(self):
         if self.dump is not None:
-            self.message = json.loads(self.dump)['message']
+            dump = json.loads(self.dump)
+            self.type = dump['type']
+            self.message = dump['message']
         else:
             dump = {"type": self.type, "message": self.message}
             self.dump = json.dumps(dump)
