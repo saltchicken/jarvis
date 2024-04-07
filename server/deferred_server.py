@@ -27,8 +27,8 @@ class ClientProtocol(basic.LineReceiver):
             message = PhraseMessage(message=output)
             self.send(message)
             self.debug(deferred.called)
-            if not deferred.called:
-                deferred.callback(output)
+            # if not deferred.called:
+            #     deferred.callback(output)
         reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
     
     def send(self, message):
