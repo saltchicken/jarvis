@@ -28,8 +28,9 @@ class ClientProtocol(basic.LineReceiver):
                 message = PhraseMessage(message=output)
                 self.send(message)
                 logger.debug(deferred.called)
-                # if not deferred.called:
-                #     deferred.callback(output)
+                if deferred.called:
+                    deferred.callback(output)
+                    break
             except Exception as e:
                 print(e)
         reactor.callLater(2, threads.deferToThread, self.sendSystemMessage, 'clear')
