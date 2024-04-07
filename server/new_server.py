@@ -25,7 +25,7 @@ class ClientProtocol(basic.LineReceiver):
         for chunk in self.factory.chain.stream(data):
             output += chunk
             # logger.debug(output)
-            data_object = {"type": "phrase", "message": output}/
+            data_object = {"type": "phrase", "message": output}
             message = PhraseMessage(message=output)
             data_string = json.dumps(data_object)
             print("message", message.dump)
