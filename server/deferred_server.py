@@ -48,18 +48,16 @@ class ClientProtocol(basic.LineReceiver):
         if self.factory.name == "Talon":
             message = JSONMessage(dump=data)
             if message.type == 'phrase':
-                self.m = defer.Deferred()
-                d = threads.deferToThread(self.runLLM, message.message, self.m)
+                self.d = defer.Deferred()
+                t = threads.deferToThread(self.runLLM, message.message, self.d)
                 def cancel_computation(d):
-                    # Cancel the Deferred object
                     d.cancel()
                 def handle_cancellation(failure):
-                    # Print a message indicating that the computation was cancelled
                     print("Computation was cancelled")
-                self.m.associatedThread = d
-                self.m.addCallback(lambda result: print("Result obtained:", result))
-                self.m.addErrback(handle_cancellation)
-                reactor.callLater(5, cancel_computation, self.m)
+                self.d.associatedThread = t
+                self.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
+                self.d.addErrback(handle_cancellation)
+                reactor.callLater(2, cancel_computation, self.d)
                 
 
 class TalonFactory(protocol.Factory):
