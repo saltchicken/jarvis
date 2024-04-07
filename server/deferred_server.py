@@ -54,7 +54,7 @@ class ClientProtocol(basic.LineReceiver):
                 t = threads.deferToThread(self.runLLM, message.message, self.factory.d)
                 self.factory.d.associatedThread = t
                 self.factory.d.addCallback(lambda result: print("Result obtained:", result)) # TODO: This never calls
-                self.factory.d.addErrback(lambda result: print(f"Cancellation Received: {result}"))
+                self.factory.d.addErrback(lambda result: print(f"Cancellation Received"))
                 # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
