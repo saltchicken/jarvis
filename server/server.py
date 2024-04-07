@@ -31,6 +31,7 @@ class ClientProtocol(basic.LineReceiver):
         logger.debug(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
             message = JSONMessage(dump=data)
+            print(message)
             if message.type == 'phrase':
                 d = threads.deferToThread(self.runLLM, message.message)
                 
