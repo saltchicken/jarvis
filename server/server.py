@@ -68,7 +68,6 @@ class TalonProtocol(basic.LineReceiver):
 class TaskerProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
-        self.d = None
 
     def connectionMade(self):
         logger.debug(f"Tasker connected")
