@@ -28,7 +28,7 @@ class ClientProtocol(basic.LineReceiver):
             self.factory.tasker.client.sendLine(message.dump.encode())
 
     def dataReceived(self, data):
-        print(f"{self.factory.name} received data: {data}")
+        logger.debug(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
             message = PhraseMessage(dump=data)
             if message.type == 'phrase':
