@@ -25,8 +25,15 @@ class ClientProtocol(basic.LineReceiver):
         for chunk in self.factory.chain.stream(data):
             output += chunk
             message = PhraseMessage(message=output)
-            self.factory.tasker.client.sendLine(message.dump.encode())
-        self.factory.tasker.client.sendLine(SystemMessage(message='clear').dump.encode())
+            self.send(message)
+        d = threads.deferToThread(self.sendSystemMessage('clear'))
+    
+    def send(self, message):
+        self.factory.tasker.client.sendLine(message.dump.encode())
+        
+    def sendSystemMessage(self, system_message):
+        self.send(SystemMessage(message=system_message))
+        
 
     def dataReceived(self, data):
         logger.debug(f"{self.factory.name} received data: {data}")

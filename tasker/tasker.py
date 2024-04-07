@@ -26,8 +26,11 @@ class ClientThread(threading.Thread):
         while not self.quit_event.is_set():
             try:
                 # TODO: Determine optimal buffer size or implement recv_all
-                data = self.client_socket.recv(4096).decode()
-                message = JSONMessage(dump=data)
+                data = self.client_socket.recv(4096 * 2).decode()
+                try:
+                    message = JSONMessage(dump=data)
+                except:
+                    print(data)
                 if message.type == 'phrase':
                     self.label.setText(message.message)
                 elif message.type == 'system':
