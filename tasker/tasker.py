@@ -30,6 +30,9 @@ class ClientThread(threading.Thread):
                 message = JSONMessage(dump=data)
                 if message.type == 'phrase':
                     self.label.setText(message.message)
+                elif message.type == 'system':
+                    if message.message == 'clear':
+                        self.label.setText('')
                 # try:
                 #     packet = json.loads(data)
                 # except:

@@ -4,7 +4,7 @@ from twisted.internet import protocol, reactor, threads
 from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
-from server.classes import PhraseMessage, JSONMessage
+from server.classes import PhraseMessage, SystemMessage, JSONMessage
 
 from loguru import logger
 
@@ -26,6 +26,7 @@ class ClientProtocol(basic.LineReceiver):
             output += chunk
             message = PhraseMessage(message=output)
             self.factory.tasker.client.sendLine(message.dump.encode())
+        self.factory.tasker.client.sendLine(SystemMessage(message='clear').dump.encode())
 
     def dataReceived(self, data):
         logger.debug(f"{self.factory.name} received data: {data}")
