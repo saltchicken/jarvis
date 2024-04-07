@@ -24,21 +24,13 @@ class ClientProtocol(basic.LineReceiver):
         output = ''
         for chunk in self.factory.chain.stream(data):
             output += chunk
-            # logger.debug(output)
-            data_object = {"type": "phrase", "message": output}
             message = PhraseMessage(message=output)
-            data_string = json.dumps(data_object)
-            print("message", message.dump)
-            print('old', data_string)
             self.factory.tasker.thing.sendLine(message.dump.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
-            # packet = json.loads(data)
             message = PhraseMessage(dump=data)
-            # print(message)
-            # if packet['type'] == 'phrase':
             if message.type == 'phrase':
                 d = threads.deferToThread(self.runLLM, message.message)
                 
