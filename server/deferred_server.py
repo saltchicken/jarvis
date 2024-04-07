@@ -60,11 +60,13 @@ class ClientProtocol(basic.LineReceiver):
                 # reactor.callLater(2, cancel_computation, self.d)
             elif message.type == 'command':
                 if message.message == "interrupt":
-                    def cancel_computation(d):
-                        d.cancel()
+                    # def cancel_computation(d):
+                    #     d.cancel()
                     if self.d == None:
                         logger.warning('self.d is None')
-                    reactor.callLater(0, cancel_computation, self.d)
+                    else:
+                        self.d.cancel()
+                    # reactor.callLater(0, cancel_computation, self.d)
                 
 
 class TalonFactory(protocol.Factory):
