@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, QTimerEvent
 import socket, threading
 from loguru import logger
 
-from server.classes import PhraseMessage
+from server.classes import PhraseMessage, JSONMessage
 
 
 
@@ -27,7 +27,7 @@ class ClientThread(threading.Thread):
             try:
                 # TODO: Determine optimal buffer size or implement recv_all
                 data = self.client_socket.recv(4096).decode()
-                message = PhraseMessage(dump=data)
+                message = JSONMessage(dump=data)
                 if message.type == 'phrase':
                     self.label.setText(message.message)
                 # try:

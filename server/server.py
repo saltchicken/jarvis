@@ -4,7 +4,7 @@ from twisted.internet import protocol, reactor, threads
 from twisted.protocols import basic
 
 from server.llm.llm import setup_llm
-from server.classes import PhraseMessage
+from server.classes import PhraseMessage, JSONMessage
 
 from loguru import logger
 
@@ -30,7 +30,7 @@ class ClientProtocol(basic.LineReceiver):
     def dataReceived(self, data):
         logger.debug(f"{self.factory.name} received data: {data}")
         if self.factory.name == "Talon":
-            message = PhraseMessage(dump=data)
+            message = JSONMessage(dump=data)
             if message.type == 'phrase':
                 d = threads.deferToThread(self.runLLM, message.message)
                 
