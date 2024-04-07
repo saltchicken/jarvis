@@ -14,11 +14,11 @@ class ClientProtocol(basic.LineReceiver):
         self.factory = factory
 
     def connectionMade(self):
-        print(f"{self.factory.name} connected")
+        logger.debug(f"{self.factory.name} connected")
         self.factory.client = self
 
     def connectionLost(self, reason):
-        print(f"{self.factory.name} disconnected")
+        logger.debug(f"{self.factory.name} disconnected")
             
     def runLLM(self, data):
         output = ''

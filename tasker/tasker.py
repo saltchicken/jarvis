@@ -96,7 +96,7 @@ class OverlayWindow(QWidget):
             self.quit_event.set()
             QApplication.quit()
         else:
-            print('This should have never been reached')
+            logger.error('This should have never been reached')
             
     def clear_action(self):
         checked = self.clear_action_checkbox.isChecked()
@@ -109,7 +109,7 @@ def main():
     parser.add('--width', type=int, required=True, help="Width of overlay")
     parser.add('--height', type=int, required=True, help="Height of overlay")
     args = parser.parse_args()
-    print(args)
+    logger.debug(args)
     app = QApplication([])
     window = OverlayWindow(args)
     window.show()
