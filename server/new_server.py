@@ -30,7 +30,7 @@ class ClientProtocol(basic.LineReceiver):
             data_string = json.dumps(data_object)
             print("message", message.dump)
             print('old', data_string)
-            # self.factory.tasker.thing.sendLine(message.dump.encode())
+            self.factory.tasker.thing.sendLine(message.dump.encode())
 
     def dataReceived(self, data):
         print(f"{self.factory.name} received data: {data}")
