@@ -1,6 +1,6 @@
 import sys, json
 import configargparse
-from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLabel, QStyle, QAction, QMenu, QSystemTrayIcon
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QLabel, QStyle, QAction, QMenu, QSystemTrayIcon, QInputDialog, QLineEdit
 from PyQt5.QtCore import Qt, QTimerEvent
 
 import socket, threading
@@ -69,6 +69,12 @@ class OverlayWindow(QWidget):
         self.label.setWordWrap(True)
         
         self.tray_menu = QMenu()
+
+        self.ask_action_checkbox = QAction('Ask', self)
+        self.ask_action_checkbox.setCheckable(True)
+        self.ask_action_checkbox.triggered.connect(self.ask_action)
+        self.tray_menu.addAction(self.ask_action_checkbox)
+        
                 
         self.clear_action_checkbox = QAction('Clear', self)
         self.clear_action_checkbox.setCheckable(True)
@@ -108,6 +114,27 @@ class OverlayWindow(QWidget):
         checked = self.clear_action_checkbox.isChecked()
         if checked:
             self.label.setText('')
+
+    def ask_action(self):
+        # input = QInputDialog()
+        # text, okPressed = input.getText(self, "Get text","Your name:", QLineEdit.Normal, "", flags=Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        # if okPressed and text != '':
+        #     # self.label.setText("You typed: " + text)
+        #     logger.debug(text)
+        input_dialog = QInputDialog()
+        input_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        input_dialog.setAttribute(Qt.WA_TranslucentBackground)
+        input_dialog.setWindowTitle('Input Dialog')
+        input_dialog.setLabelText('Enter your name:')
+        
+        # Show the input dialog
+        ok = input_dialog.exec_()
+
+        # Check if OK button was pressed
+        if ok:
+            # Retrieve the text value entered by the user
+            text = input_dialog.textValue()
+            print('Your name:', text)
           
           
 def main():
@@ -117,6 +144,11 @@ def main():
     args = parser.parse_args()
     logger.debug(args)
     app = QApplication([])
+
+    with open('tasker/conf/style.css', 'r') as f:
+        stylesheet = f.read()
+        app.setStyleSheet(stylesheet)
+        
     window = OverlayWindow(args)
     window.show()
     sys.exit(app.exec_())   

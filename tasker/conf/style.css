@@ -1,0 +1,23 @@
+QInputDialog {
+    background-color: #f0f0f0; /* Light Gray */
+    border: 2px solid #008CBA; /* Blue */
+}
+QLabel {
+    color: #333; /* Dark Gray */
+}
+QLineEdit {
+    background-color: #fff; /* White */
+    border: 1px solid #ccc; /* Light Gray */
+    padding: 5px;
+}
+QPushButton {
+    background-color: #008CBA; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 5px;
+}
+QPushButton:hover {
+    background-color: #005F6B; /* Dark Blue */
+}
