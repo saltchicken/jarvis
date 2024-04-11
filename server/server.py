@@ -14,6 +14,7 @@ class ChunkSenderThread():
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect(('192.168.1.100', 10500))
+        logger.debug('Chunk Sender connected')
         
     def send(self, text):
         self.s.sendall(text.encode())
