@@ -24,6 +24,7 @@ class TalonProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
         self.d = None
+        logger.debug('This should run')
         self.chunk_sender = ChunkSenderThread()
 
     def connectionMade(self):
