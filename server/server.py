@@ -24,6 +24,7 @@ class TalonProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
         self.d = None
+        # TODO: Why is this not logging
         logger.debug('This should run')
         self.chunk_sender = ChunkSenderThread()
 
@@ -36,12 +37,19 @@ class TalonProtocol(basic.LineReceiver):
             
     def runLLM(self, data, deferred):
         output = ''
+        chunk_buffer = ''
+        chunk_counter = 0
         for chunk in self.factory.chain.stream(data):
             try:
                 output += chunk
+                chunk_buffer += chunk
+                chunk_counter += 1
+                if chunk_buffer == 6:
+                    self.chunk_sender.send(chunk_buffer)
+                    chunk_counter = 0
+                    
                 message = PhraseMessage(message=output)
                 self.send(message)
-                self.chunk_sender.send(chunk)
                 # logger.debug(deferred.called)
                 if deferred.called:
                     deferred.callback(output)
