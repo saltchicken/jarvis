@@ -8,7 +8,23 @@ from loguru import logger
 
 from server.classes import PhraseMessage, JSONMessage
 
-
+# class ChunkSenderThread():
+#     def __init__(self):
+#         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         self.s.connect(('192.168.1.100', 10500))
+        
+#     def send(self, text):
+#         self.s.sendall(text.encode())
+        
+    # def run(self):
+    #     while True:
+    #         user_input = input('Enter your speech')
+            
+    #         if user_input.lower() == 'quit':
+    #             break
+            
+    #         self.s.sendall(user_input.encode())
+    #     logger.debug('Exiting ChunkSender')
 
 class ClientThread(threading.Thread):
     def __init__(self, label, quit_event):
@@ -17,6 +33,7 @@ class ClientThread(threading.Thread):
         self.quit_event = quit_event
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.settimeout(1)
+        # self.chunk_sender = ChunkSenderThread()
 
     def run(self):
         server_address = '192.168.1.11'
@@ -33,6 +50,7 @@ class ClientThread(threading.Thread):
                     print(data)
                 if message.type == 'phrase':
                     self.label.setText(message.message)
+                    # self.chunk_sender.send(message.message)
                 elif message.type == 'system':
                     if message.message == 'clear':
                         self.label.setText('')

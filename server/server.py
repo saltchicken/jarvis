@@ -8,11 +8,22 @@ from server.classes import PhraseMessage, SystemMessage, JSONMessage
 
 from loguru import logger
 
+import socket
+
+class ChunkSenderThread():
+    def __init__(self):
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(('192.168.1.100', 10500))
+        
+    def send(self, text):
+        self.s.sendall(text.encode())
+
 
 class TalonProtocol(basic.LineReceiver):
     def __init__(self, factory):
         self.factory = factory
         self.d = None
+        self.chunk_sender = ChunkSenderThread()
 
     def connectionMade(self):
         logger.debug(f"Talon connected")
@@ -28,6 +39,7 @@ class TalonProtocol(basic.LineReceiver):
                 output += chunk
                 message = PhraseMessage(message=output)
                 self.send(message)
+                self.chunk_sender.send(chunk)
                 # logger.debug(deferred.called)
                 if deferred.called:
                     deferred.callback(output)
