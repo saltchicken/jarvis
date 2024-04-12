@@ -49,6 +49,7 @@ class TalonProtocol(basic.LineReceiver):
                     logger.debug(chunk_buffer)
                     self.chunk_sender.send(chunk_buffer)
                     chunk_counter = 0
+                    chunk_buffer = ''
                     
                 message = PhraseMessage(message=output)
                 self.send(message)
