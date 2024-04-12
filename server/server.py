@@ -10,14 +10,14 @@ from loguru import logger
 
 import socket
 
-class ChunkSenderThread():
-    def __init__(self):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('192.168.1.100', 10500))
-        logger.debug('Chunk Sender connected')
+# class ChunkSenderThread():
+#     def __init__(self):
+#         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         self.s.connect(('192.168.1.100', 10500))
+#         logger.debug('Chunk Sender connected')
         
-    def send(self, text):
-        self.s.sendall(text.encode())
+#     def send(self, text):
+#         self.s.sendall(text.encode())
 
 
 class TalonProtocol(basic.LineReceiver):
@@ -26,7 +26,7 @@ class TalonProtocol(basic.LineReceiver):
         self.d = None
         # TODO: Why is this not logging
         logger.debug('This should run')
-        self.chunk_sender = ChunkSenderThread()
+        # self.chunk_sender = ChunkSenderThread()
 
     def connectionMade(self):
         logger.debug(f"Talon connected")
@@ -37,19 +37,19 @@ class TalonProtocol(basic.LineReceiver):
             
     def runLLM(self, data, deferred):
         output = ''
-        chunk_buffer = ''
-        chunk_counter = 0
+        # chunk_buffer = ''
+        # chunk_counter = 0
         for chunk in self.factory.chain.stream(data):
             try:
                 output += chunk
-                chunk_buffer += chunk
-                chunk_counter += 1
+                # chunk_buffer += chunk
+                # chunk_counter += 1
                 
-                if chunk_counter == 20:
-                    logger.debug(chunk_buffer)
-                    self.chunk_sender.send(chunk_buffer)
-                    chunk_counter = 0
-                    chunk_buffer = ''
+                # if chunk_counter == 20:
+                #     logger.debug(chunk_buffer)
+                #     self.chunk_sender.send(chunk_buffer)
+                #     chunk_counter = 0
+                #     chunk_buffer = ''
                     
                 message = PhraseMessage(message=output)
                 self.send(message)
