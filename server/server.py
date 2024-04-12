@@ -45,7 +45,7 @@ class TalonProtocol(basic.LineReceiver):
                 chunk_buffer += chunk
                 chunk_counter += 1
                 
-                if chunk_counter == 6:
+                if chunk_counter == 20:
                     logger.debug(chunk_buffer)
                     self.chunk_sender.send(chunk_buffer)
                     chunk_counter = 0
